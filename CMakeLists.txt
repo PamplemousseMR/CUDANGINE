@@ -21,5 +21,5 @@ IF(NOT ${CUDA_FOUND})
 ENDIF()
 
 #------------ create project ------------
-INCLUDE_DIRECTORIES(${cudangine_header_dir})
 CUDA_ADD_EXECUTABLE(${cudangine_project_name}  ${cudangine_src_files} ${cudangine_header_files})
+TARGET_INCLUDE_DIRECTORIES(${cudangine_project_name} PRIVATE ${cudangine_header_dir})
