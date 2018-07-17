@@ -11,15 +11,23 @@ class Buffer
 
 public:
 
-    Buffer(int, T*) throw(Exception);
+    Buffer(size_t, T*) throw(Exception);
 
     ~Buffer();
 
-    operator T*();
+    void synchronizeHost() throw(Exception);
+
+    void synchronizeDevice() throw(Exception);
+
+    operator T*() const noexcept;
 
 private:
 
-    T* m_data;
+    T* m_dataH;
+
+    T* m_dataD;
+
+    const size_t m_elem;
 
 };
 
