@@ -4,6 +4,8 @@
 #include "buffer.hpp"
 #include "buffer.hxx"
 
+#include "exception.hpp"
+
 template< typename T >
 __host__ __device__ void affect(T* _arr, size_t _index, T _value)
 {
@@ -47,6 +49,25 @@ __global__ void kernelMultEquals()
 
 //----------------------------------------------------------------------------------------------------
 
+__device__ __constant__ short divider = 2;
+
+__global__ void kernelDivEquals(double* const _vecA, unsigned _size)
+{
+    printf("gridSize: %d, blockId: %d, threadByBlock: %d, threadIdInBlock: %d, warpSize: %d\n", gridDim.x, blockIdx.x, blockDim.x, threadIdx.x, warpSize);
+    const unsigned globalSize = gridDim.x * blockDim.x;
+    const double localSize = _size/__uint2double_rn(globalSize);
+    const unsigned index = blockIdx.x*blockDim.x + threadIdx.x;
+    const unsigned begin = index * localSize;
+    const unsigned end = index * localSize + localSize;
+    printf("global: %d, local: %f, begin: %d, end: %d\n", globalSize, localSize, begin, end);
+    for(int i = begin ; i < end ; ++i)
+    {
+        _vecA[i] /= divider;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------
+
 int main(int argc, char **argv)
 {
     // Basic exemple
@@ -85,7 +106,7 @@ int main(int argc, char **argv)
     }*/
 
     // Memory copy exemple
-    {
+    /*{
         const unsigned size = 10;
         int vecA[size];
         int vecB[size];
@@ -114,6 +135,56 @@ int main(int argc, char **argv)
         for (int i = 0; i < size ; ++i)
         {
             std::cout << vecA[i] << " " ;
+        }
+        std::cout << std::endl;
+    }*/
+
+    // Stream exemple
+    {
+        const unsigned size = 35;
+        double vecA[size];
+        double vecB[size];
+
+        for (int i = 0; i < size ; ++i)
+        {
+            vecA[i] = i+1;
+            vecB[i] = i*4;
+        }
+
+        cudangine::Buffer<double> bufVecA(size, vecA);
+        cudangine::Buffer<double> bufVecB(size, vecB);
+
+        cudaStream_t stream1, stream2;
+        cudaError_t err = cudaStreamCreate(&stream1);
+        if(err != cudaSuccess)
+        {
+            throw cudangine::Exception(err);
+        }
+        err = cudaStreamCreate(&stream2);
+        if(err != cudaSuccess)
+        {
+            throw cudangine::Exception(err);
+        }
+
+        kernelDivEquals<<<2,4, 0, stream1>>>(bufVecA, size);
+        kernelDivEquals<<<2,4, 0, stream1>>>(bufVecA, size);
+        kernelDivEquals<<<2,4, 0, stream2>>>(bufVecB, size);
+        kernelDivEquals<<<2,4, 0, stream2>>>(bufVecB, size);
+        cudaStreamSynchronize(stream1);
+        cudaStreamSynchronize(stream2);
+
+        bufVecA.synchronizeHost();
+        bufVecB.synchronizeHost();
+
+        for (int i = 0; i < size ; ++i)
+        {
+            std::cout << vecA[i] << " " ;
+        }
+        std::cout << std::endl;
+
+        for (int i = 0; i < size ; ++i)
+        {
+            std::cout << vecB[i] << " " ;
         }
         std::cout << std::endl;
     }
