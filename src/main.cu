@@ -6,6 +6,10 @@
 
 #include "exception.hpp"
 
+#include "point.hpp"
+
+//http://www.icl.utk.edu/~mgates3/docs/cuda.html
+
 template< typename T >
 __host__ __device__ void affect(T* _arr, size_t _index, T _value)
 {
@@ -63,6 +67,24 @@ __global__ void kernelDivEquals(double* const _vecA, unsigned _size)
     for(int i = begin ; i < end ; ++i)
     {
         _vecA[i] /= divider;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------
+
+__global__ void kernelPointPlusEquals(cudangine::Point* const _vecA, const cudangine::Point* const _vecB, unsigned _size)
+{
+    printf("gridSize: %d, blockId: %d, threadByBlock: %d, threadIdInBlock: %d, warpSize: %d\n", gridDim.x, blockIdx.x, blockDim.x, threadIdx.x, warpSize);
+    const unsigned globalSize = gridDim.x * blockDim.x;
+    const double localSize = _size/__uint2double_rn(globalSize);
+    const unsigned index = blockIdx.x*blockDim.x + threadIdx.x;
+    const unsigned begin = index * localSize;
+    const unsigned end = index * localSize + localSize;
+    printf("global: %d, local: %f, begin: %d, end: %d\n", globalSize, localSize, begin, end);
+    for(int i = begin ; i < end ; ++i)
+    {
+        _vecA[i].m_x += _vecB[i].m_x;
+        _vecA[i].m_y += _vecB[i].m_y;
     }
 }
 
@@ -140,7 +162,7 @@ int main(int argc, char **argv)
     }*/
 
     // Stream exemple
-    {
+    /*{
         const unsigned size = 35;
         double vecA[size];
         double vecB[size];
@@ -185,6 +207,39 @@ int main(int argc, char **argv)
         for (int i = 0; i < size ; ++i)
         {
             std::cout << vecB[i] << " " ;
+        }
+        std::cout << std::endl;
+    }*/
+
+    // Class exemple
+    {
+        const unsigned size = 10;
+        cudangine::Point vecA[size];
+        cudangine::Point vecB[size];
+
+        for (int i = 0; i < size ; ++i)
+        {
+            vecA[i] = cudangine::Point(i,i);
+            vecB[i] = cudangine::Point(i,i);
+        }
+
+        cudangine::Buffer<cudangine::Point> bufVecA(size, vecA);
+        cudangine::Buffer<cudangine::Point> bufVecB(size, vecB);
+
+        kernelPointPlusEquals<<<2,4>>>(bufVecA, bufVecB, size);
+        cudaDeviceSynchronize();
+
+        for (int i = 0; i < size ; ++i)
+        {
+            std::cout << "{" << vecA[i].m_x << ", " << vecA[i].m_y << "} ";
+        }
+        std::cout << std::endl;
+
+        bufVecA.synchronizeHost();
+
+        for (int i = 0; i < size ; ++i)
+        {
+            std::cout << "{" << vecA[i].m_x << ", " << vecA[i].m_y << "} ";
         }
         std::cout << std::endl;
     }

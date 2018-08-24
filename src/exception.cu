@@ -3,8 +3,8 @@
 namespace cudangine
 {
 
-    Exception::Exception(const cudaError_t& _error) noexcept
-        :   std::exception()
+    Exception::Exception(const cudaError_t& _error) noexcept :
+        std::exception()
     {
         m_message = cudaGetErrorString(_error);
     }
