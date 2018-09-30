@@ -1,7 +1,7 @@
-#include "exemples.hpp"
+#include <stdio.h>
 
-#include "buffer.hpp"
-#include "buffer.hxx"
+#include <buffer.hpp>
+#include <buffer.hxx>
 
 #include "point.hpp"
 
@@ -19,7 +19,7 @@ __global__ void kernelPointPlusEquals(cudangine::Point* const _vecA, const cudan
     }
 }
 
-void classTest()
+int main(int argc, char **argv)
 {
     const unsigned size = 10;
     cudangine::Point vecA[size];
@@ -39,4 +39,6 @@ void classTest()
 
 
     bufVecA.synchronizeHost();
+
+    return EXIT_SUCCESS;
 }

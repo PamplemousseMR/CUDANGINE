@@ -1,7 +1,13 @@
-#include "exemples.hpp"
+#include <stdio.h>
 
-#include "buffer.hpp"
-#include "buffer.hxx"
+#include <buffer.hpp>
+#include <buffer.hxx>
+
+template< typename T >
+__host__ __device__ void affect(T* _arr, size_t _index, T _value)
+{
+    _arr[_index] = _value;
+}
 
 __global__ void kernelPlusEquals(int* const _vecA, const int* const _vecB, unsigned _size)
 {
@@ -16,7 +22,7 @@ __global__ void kernelPlusEquals(int* const _vecA, const int* const _vecB, unsig
     }
 }
 
-void basicTest()
+int main(int argc, char **argv)
 {
     const unsigned size = 35;
     int vecA[size];
@@ -37,4 +43,6 @@ void basicTest()
     cudaDeviceSynchronize();
 
     bufVecA.synchronizeHost();
+
+    return EXIT_SUCCESS;
 }

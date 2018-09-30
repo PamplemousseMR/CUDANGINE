@@ -1,11 +1,16 @@
-#include "exemples.hpp"
+#include <stdio.h>
 
-#include "buffer.hpp"
-#include "buffer.hxx"
-
-#include "exception.hpp"
+#include <buffer.hpp>
+#include <buffer.hxx>
+#include <exception.hpp>
 
 __device__ __constant__ short divider = 2;
+
+template< typename T >
+__host__ __device__ void affect(T* _arr, size_t _index, T _value)
+{
+    _arr[_index] = _value;
+}
 
 __global__ void kernelDivEquals(double* const _vecA, unsigned _size)
 {
@@ -20,7 +25,7 @@ __global__ void kernelDivEquals(double* const _vecA, unsigned _size)
     }
 }
 
-void streamTest()
+int main(int argc, char **argv)
 {
     const unsigned size = 35;
     double vecA[size];
@@ -56,4 +61,6 @@ void streamTest()
 
     bufVecA.synchronizeHost();
     bufVecB.synchronizeHost();
+
+    return EXIT_SUCCESS;
 }

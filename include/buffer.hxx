@@ -6,7 +6,7 @@ namespace cudangine
 {
 
 template<class T>
-Buffer<T>::Buffer(size_t _elem, T* _data) throw(...) :
+Buffer<T>::Buffer(size_t _elem, T* _data) :
     m_dataH(_data),
     m_elem(_elem)
 {

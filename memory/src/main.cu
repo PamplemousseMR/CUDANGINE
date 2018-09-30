@@ -1,4 +1,7 @@
-#include "exemples.hpp"
+#include <stdio.h>
+
+#include <buffer.hpp>
+#include <buffer.hxx>
 
 __device__ int deviceBufA[10];
 __device__ int deviceBufB[10];
@@ -15,8 +18,7 @@ __global__ void kernelMultEquals()
         deviceBufA[i] *= deviceBufB[i];
     }
 }
-
-void memoryTest()
+int main(int argc, char **argv)
 {
     const unsigned size = 10;
     int vecA[size];
@@ -36,4 +38,6 @@ void memoryTest()
 
     cudaMemcpyFromSymbol(vecA, deviceBufA,size*sizeof(int));
     cudaMemcpyFromSymbol(vecB, deviceBufB,size*sizeof(int));
+
+    return EXIT_SUCCESS;
 }
