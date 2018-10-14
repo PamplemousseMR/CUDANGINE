@@ -10,7 +10,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 - [CUDA](https://developer.nvidia.com/cuda-downloads) :  A GPGPU technology.
 
-### generate
+### Generation
 
 Generate using cmake: `cmake`.
 

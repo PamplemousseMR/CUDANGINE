@@ -76,11 +76,9 @@ ENDFUNCTION()
 #========================================
 SET(cudangine_project_dir "")
 
-FILE(GLOB cudangine_glob_dir ./*)
+FILE(GLOB cudangine_glob_dir "./sample/*")
 FOREACH(cudangine_dir ${cudangine_glob_dir})
-    IF((IS_DIRECTORY ${cudangine_dir}) AND (NOT ${cudangine_dir} MATCHES ".*git") AND (NOT ${cudangine_dir} MATCHES "include") AND (NOT ${cudangine_dir} MATCHES "src"))
-        LIST(APPEND cudangine_project_dir ${cudangine_dir})
-    ENDIF()
+    LIST(APPEND cudangine_project_dir ${cudangine_dir})
 ENDFOREACH()
 
 #========================================
