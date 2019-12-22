@@ -12,7 +12,9 @@ public:
 
     Exception(const cudaError_t&) noexcept;
 
-    virtual const char* what() const noexcept override;
+    virtual ~Exception() override;
+
+    const char* what() const noexcept override;
 
 private:
 

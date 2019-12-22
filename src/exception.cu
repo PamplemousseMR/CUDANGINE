@@ -9,6 +9,10 @@ namespace cudangine
         m_message = cudaGetErrorString(_error);
     }
 
+    Exception::~Exception()
+    {
+    }
+
     const char* Exception::what() const noexcept
     {
         return m_message.c_str();

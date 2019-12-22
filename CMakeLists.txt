@@ -2,7 +2,7 @@
 #	project http://www.icl.utk.edu/~mgates3/docs/cuda.html
 #========================================
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
-PROJECT("CUDANGINE" C CXX)
+PROJECT("CUDANGINE" CXX)
 
 #================================================================================
 #		init
@@ -14,6 +14,11 @@ PROJECT("CUDANGINE" C CXX)
 SET(cudangine_lib_src_dir "src")
 SET(cudangine_lib_header_dir "include")
 SET(cudangine_lib_name "cudangine")
+
+#========================================
+#	compiler specifications
+#========================================
+SET(CMAKE_CXX_STANDARD 14)
 
 #========================================
 #	find files
@@ -39,6 +44,10 @@ ENDIF()
 #========================================
 CUDA_ADD_LIBRARY(${cudangine_lib_name}  ${cudangine_lib_src_files} ${cudangine_lib_header_files})
 TARGET_INCLUDE_DIRECTORIES(${cudangine_lib_name} PUBLIC ${cudangine_lib_header_dir})
+CUDA_INCLUDE_DIRECTORIES(${cudangine_lib_header_dir})
+
+TARGET_COMPILE_FEATURES(${cudangine_lib_name} PUBLIC cxx_noexcept)
+TARGET_COMPILE_FEATURES(${cudangine_lib_name} PUBLIC cxx_override)
 
 #================================================================================
 #		create
@@ -68,7 +77,11 @@ FUNCTION(cudangineTest)
 
     CUDA_ADD_EXECUTABLE(${cudangine_current_name} ${cudangine_src_files} ${cudangine_header_files})
     TARGET_INCLUDE_DIRECTORIES(${cudangine_current_name} PRIVATE ${cudangine_header_dir} "../${cudangine_lib_header_dir}")
+    CUDA_INCLUDE_DIRECTORIES(${cudangine_header_dir} "../${cudangine_lib_header_dir}")
     TARGET_LINK_LIBRARIES(${cudangine_current_name} PRIVATE ${cudangine_lib_name})
+
+    TARGET_COMPILE_FEATURES(${cudangine_current_name} PUBLIC cxx_noexcept)
+    TARGET_COMPILE_FEATURES(${cudangine_current_name} PUBLIC cxx_override)
 ENDFUNCTION()
 
 #========================================
