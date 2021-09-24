@@ -2,9 +2,9 @@
 
 CUDA sandbox.
 
-## Travis
+## CI
 
-[![Build Status](https://travis-ci.com/PamplemousseMR/CUDANGINE.svg?branch=master)](https://travis-ci.com/PamplemousseMR/CUDANGINE)
+![Build Status](https://github.com/PamplemousseMR/CUDANGINE/actions/workflows/build.yml/badge.svg)
 
 ## Getting Started
 
