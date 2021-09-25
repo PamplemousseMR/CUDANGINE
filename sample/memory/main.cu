@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#include <buffer.hpp>
-#include <buffer.hxx>
+#include <cudangine/buffer.hpp>
+#include <cudangine/buffer.hxx>
 
 __device__ int deviceBufA[10];
 __device__ int deviceBufB[10];

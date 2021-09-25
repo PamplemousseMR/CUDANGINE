@@ -1,103 +1,57 @@
-#========================================
-#	project http://www.icl.utk.edu/~mgates3/docs/cuda.html
-#========================================
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
-PROJECT("CUDANGINE" CXX)
+#=======================================
+#                PROJECT
+#=======================================
 
-#================================================================================
-#		init
-#================================================================================
+cmake_minimum_required(VERSION 3.8)
+project("CUDANGINE" CXX CUDA)
 
-#========================================
-#	variables
-#========================================
-SET(cudangine_lib_src_dir "src")
-SET(cudangine_lib_header_dir "include")
-SET(cudangine_lib_name "cudangine")
+#=======================================
+#               LIBRARIES
+#=======================================
 
-#========================================
-#	compiler specifications
-#========================================
-SET(CMAKE_CXX_STANDARD 14)
+find_package("CUDA" REQUIRED)
 
-#========================================
-#	find files
-#========================================
-FILE(GLOB_RECURSE cudangine_lib_src_files ${cudangine_lib_src_dir}/*)
-FILE(GLOB_RECURSE cudangine_lib_header_files ${cudangine_lib_header_dir}/*)
+#=======================================
+#                LIBRARY                
+#=======================================
 
-#================================================================================
-#		create commun lib
-#================================================================================
+set(cudangine_src
+    "cudangine/cudangine/exception.cu")
 
-#========================================
-#	find CUDA
-#========================================
-FIND_PACKAGE("CUDA")
+set(cudangine_header
+    "cudangine/cudangine/buffer.hpp"
+    "cudangine/cudangine/buffer.hxx"
+    "cudangine/cudangine/exception.hpp")
 
-IF(NOT ${CUDA_FOUND})
-    MESSAGE(FATAL_ERROR "Can't find CUDA")
-ENDIF()
+cuda_add_library(cudangine  ${cudangine_src} ${cudangine_header})
+target_include_directories(cudangine PUBLIC "cudangine")
+cuda_include_directories("cudangine")
 
-#========================================
-#	create lib
-#========================================
-CUDA_ADD_LIBRARY(${cudangine_lib_name}  ${cudangine_lib_src_files} ${cudangine_lib_header_files})
-TARGET_INCLUDE_DIRECTORIES(${cudangine_lib_name} PUBLIC ${cudangine_lib_header_dir})
-CUDA_INCLUDE_DIRECTORIES(${cudangine_lib_header_dir})
+target_compile_features(cudangine PUBLIC cxx_noexcept)
+target_compile_features(cudangine PUBLIC cxx_override)
 
-TARGET_COMPILE_FEATURES(${cudangine_lib_name} PUBLIC cxx_noexcept)
-TARGET_COMPILE_FEATURES(${cudangine_lib_name} PUBLIC cxx_override)
+#=======================================
+#                SAMPLES
+#=======================================
 
-#================================================================================
-#		create
-#================================================================================
+function(add_sample)
+    set(options "")
+    set(singleValues "")
+    set(multipleValues SOURCES HEADERS)
 
-#========================================
-#	create one project by name
-#========================================
-FUNCTION(cudangineTest)
+    cmake_parse_arguments(SAMPLE "${options}" "${singleValues}" "${multipleValues}" ${ARGN})
 
-    #========================================
-    #	variables
-    #========================================
-    SET(cudangine_src_dir "src")
-    SET(cudangine_header_dir "include")
+    get_filename_component(cudangine_current_name ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
-    #====================
-    #	find files
-    #====================
-    FILE(GLOB_RECURSE cudangine_src_files ${cudangine_src_dir}/*)
-    FILE(GLOB_RECURSE cudangine_header_files ${cudangine_header_dir}/*)
+    cuda_add_executable(${cudangine_current_name} ${SAMPLE_SOURCES} ${SAMPLE_HEADERS})
+    set_target_properties(${cudangine_current_name} PROPERTIES CXX_STANDARD 14)
+    target_link_libraries(${cudangine_current_name} cudangine)
 
-    #====================
-    #	create project
-    #====================
-    GET_FILENAME_COMPONENT(cudangine_current_name ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+    target_compile_features(${cudangine_current_name} PUBLIC cxx_noexcept)
+    target_compile_features(${cudangine_current_name} PUBLIC cxx_override)
+endfunction()
 
-    CUDA_ADD_EXECUTABLE(${cudangine_current_name} ${cudangine_src_files} ${cudangine_header_files})
-    TARGET_INCLUDE_DIRECTORIES(${cudangine_current_name} PRIVATE ${cudangine_header_dir} "../${cudangine_lib_header_dir}")
-    CUDA_INCLUDE_DIRECTORIES(${cudangine_header_dir} "../${cudangine_lib_header_dir}")
-    TARGET_LINK_LIBRARIES(${cudangine_current_name} PRIVATE ${cudangine_lib_name})
-
-    TARGET_COMPILE_FEATURES(${cudangine_current_name} PUBLIC cxx_noexcept)
-    TARGET_COMPILE_FEATURES(${cudangine_current_name} PUBLIC cxx_override)
-ENDFUNCTION()
-
-#========================================
-#	find subdirectories
-#========================================
-SET(cudangine_project_dir "")
-
-FILE(GLOB cudangine_glob_dir "./sample/*")
-FOREACH(cudangine_dir ${cudangine_glob_dir})
-    LIST(APPEND cudangine_project_dir ${cudangine_dir})
-ENDFOREACH()
-
-#========================================
-#	create projects
-#========================================
-FOREACH(cudangine_dir ${cudangine_project_dir})
-    MESSAGE(INFO " generate project : " ${cudangine_dir})
-    ADD_SUBDIRECTORY(${cudangine_dir})
-ENDFOREACH()
+add_subdirectory("sample/basic")
+add_subdirectory("sample/class")
+add_subdirectory("sample/memory")
+add_subdirectory("sample/stream")

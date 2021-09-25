@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#include <buffer.hpp>
-#include <buffer.hxx>
+#include <cudangine/buffer.hpp>
+#include <cudangine/buffer.hxx>
 
 template< typename T >
 __host__ __device__ void affect(T* _arr, size_t _index, T _value)

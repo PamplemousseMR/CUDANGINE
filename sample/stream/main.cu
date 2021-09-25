@@ -1,8 +1,8 @@
 #include <stdio.h>
 
-#include <buffer.hpp>
-#include <buffer.hxx>
-#include <exception.hpp>
+#include <cudangine/buffer.hpp>
+#include <cudangine/buffer.hxx>
+#include <cudangine/exception.hpp>
 
 __device__ __constant__ short divider = 2;
 
