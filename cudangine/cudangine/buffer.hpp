@@ -2,6 +2,8 @@
 
 #include "exception.hpp"
 
+#include <vector>
+
 namespace cudangine
 {
 
@@ -19,11 +21,13 @@ public:
 
     void synchronizeDevice();
 
+    std::vector<T>& data();
+
     operator T*() const noexcept;
 
 private:
 
-    T* m_dataH;
+    std::vector<T> m_dataH;
 
     T* m_dataD;
 

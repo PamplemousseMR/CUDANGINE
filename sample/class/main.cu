@@ -2,6 +2,7 @@
 
 #include <cudangine/buffer.hpp>
 #include <cudangine/buffer.hxx>
+#include <iostream>
 
 #include "point.hpp"
 

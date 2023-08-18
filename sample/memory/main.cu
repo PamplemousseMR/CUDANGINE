@@ -1,3 +1,4 @@
+#include <iostream>
 #include <stdio.h>
 
 #include <cudangine/buffer.hpp>
@@ -30,14 +31,19 @@ int main(int argc, char **argv)
         vecB[i] = i;
     }
 
-    cudaMemcpyToSymbol(deviceBufA, vecA,size*sizeof(int));
-    cudaMemcpyToSymbol(deviceBufB, vecB,size*sizeof(int));
+    cudaMemcpyToSymbol(deviceBufA, vecA, size*sizeof(int));
+    cudaMemcpyToSymbol(deviceBufB, vecB, size*sizeof(int));
 
     kernelMultEquals<<<2,4>>>();
     cudaDeviceSynchronize();
 
     cudaMemcpyFromSymbol(vecA, deviceBufA,size*sizeof(int));
     cudaMemcpyFromSymbol(vecB, deviceBufB,size*sizeof(int));
+
+    for(int i=0 ; i<size ; ++i)
+    {
+        std::cout << "result: " << vecA[i] << std::endl;
+    }
 
     return EXIT_SUCCESS;
 }
